@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EMAGP – Emergency Medical Access Governance Protocol</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--text:#16202e;--muted:#5a6778;--accent:#c0392b;--blue:#1f6feb;--ok:#14883f;--line:#dde3ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e141c;--card:#161e29;--text:#e6ecf4;--muted:#9aa8ba;--accent:#ff6b5b;--blue:#6aa6ff;--ok:#43c46f;--line:#2a3646;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e141c;--card:#161e29;--text:#e6ecf4;--muted:#9aa8ba;--accent:#ff6b5b;--blue:#6aa6ff;--ok:#43c46f;--line:#2a3646;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,#7b1e16,#c0392b 65%,#e5654f);color:#fff;padding:28px 18px;text-align:center}
+header h1{margin:0 0 4px;font-size:clamp(21px,4.5vw,32px)}header p{margin:0;opacity:.9;font-size:14px}
+.team{margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.team span{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);border-radius:99px;padding:5px 15px;font-weight:600;font-size:14px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;overflow-x:auto;padding:0 8px}
+nav button{background:none;color:var(--muted);border:0;border-bottom:3px solid transparent;border-radius:0;padding:12px 14px;margin:0;font-weight:600;white-space:nowrap}
+nav button.on{color:var(--accent);border-color:var(--accent)}
+main{max-width:1000px;margin:0 auto;padding:16px 14px 50px}
+.tab{display:none}.tab.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:17px;color:var(--accent)}
+label{display:block;font-size:13px;color:var(--muted);margin:9px 0 3px}
+input,select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
+button{font:inherit;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 13px;margin:8px 6px 0 0;font-weight:600;cursor:pointer}
+button.alt{background:var(--blue)}button.gray{background:var(--muted)}button:disabled{opacity:.4;cursor:not-allowed}
+.msg{margin-top:10px;padding:10px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font-size:14px;min-height:20px;word-break:break-word}
+.ok{color:var(--ok);font-weight:600}.no{color:var(--accent);font-weight:600}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--bg);border:1px solid var(--line)}
+.bg{background:var(--accent);color:#fff;border-color:var(--accent)}
+code{font:12px ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--bg)}
+tr.bad td{background:rgba(192,57,43,.2)}
+.hint{font-size:12.5px;color:var(--muted)}
+ol,ul{padding-left:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>Emergency Medical Access Governance Protocol</h1>
+<p>Operating Systems Project · working “break-glass” access control simulator</p>
+<div class="team"><span>Anant Tripathi</span><span>Mukul Kumar Singh</span></div>
+</header>
+<nav id="nav">
+<button data-t="console" class="on">Console</button><button data-t="log">Audit Log</button><button data-t="review">Review</button><button data-t="sched">Scheduler</button><button data-t="about">About</button>
+</nav>
+<main>
+
+<div class="tab on" id="console">
+<div class="grid">
+<div class="card">
+<h2>1 · Login</h2>
+<label for="uid">User</label>
+<select id="uid"></select>
+<label for="pw">Password</label>
+<input id="pw" type="password" placeholder="user id + pass, e.g. d2pass">
+<button id="login">Login</button><button class="gray" id="logout">Logout</button>
+<div class="msg" id="who">Not logged in.</div>
+<p class="hint">Demo passwords: <code>d1pass</code>, <code>d2pass</code>, <code>n1pass</code>, <code>a1pass</code>, <code>s1pass</code></p>
+</div>
+<div class="card">
+<h2>2 · Request access</h2>
+<label for="pid">Patient</label>
+<select id="pid"><option value="p100">P100 (treating doctor: d1, ward A)</option><option value="p200">P200 (treating doctor: d2, ward ER)</option></select>
+<label for="em">Situation</label>
+<select id="em"><option value="0">Routine request</option><option value="1">EMERGENCY (break-glass)</option></select>
+<label for="rs">Emergency reason code</label>
+<select id="rs"><option>UNCONSCIOUS</option><option>CARDIAC</option><option>TRAUMA</option><option>STROKE</option><option>RESPIRATORY</option><option>BORED</option></select>
+<label for="ap">Approving doctor (needed for nurses)</label>
+<select id="ap"><option value="">none</option><option value="d1">d1 · Dr. Rao</option><option value="d2">d2 · Dr. Mehta</option></select>
+<button id="req">Request access</button>
+<div class="msg" id="reqmsg"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>3 · Capability token &amp; patient record</h2>
+<div id="tokinfo" class="msg">No token yet.</div>
+<div id="fields"></div>
+<label for="note">New note (write needs a read-write token)</label>
+<input id="note" placeholder="Type a clinical note">
+<button class="alt" id="write">Write note</button>
+<button class="gray" id="revoke">Revoke token</button>
+<button class="gray" id="fwd">Fast-forward clock +10 min</button>
+<span class="hint" id="clk"></span>
+<div class="msg" id="recmsg"></div>
+</div>
+</div>
+
+<div class="tab" id="log">
+<div class="card">
+<h2>Tamper-evident audit log</h2>
+<p class="hint">Each entry stores a SHA-256 hash of its content plus the previous hash. Editing any entry breaks the chain from that point.</p>
+<button class="alt" id="ver">Verify chain</button><button id="tamper">Simulate tampering</button><button class="gray" id="reset">Reset system</button>
+<div class="msg" id="verout"></div>
+<div class="scroll"><table><thead><tr><th>#</th><th>Time</th><th>Actor</th><th>Action</th><th>Patient</th><th>Detail</th><th>Hash</th></tr></thead><tbody id="logbody"></tbody></table></div>
+</div>
+</div>
+
+<div class="tab" id="review">
+<div class="card">
+<h2>Post-incident review (supervisor only)</h2>
+<p class="hint">Log in as <code>s1</code> on the Console tab. Rejecting a case suspends that user’s emergency rights.</p>
+<div id="revlist"></div>
+</div>
+</div>
+
+<div class="tab" id="sched">
+<div class="card">
+<h2>Priority scheduler with aging</h2>
+<p class="hint">Emergency requests (priority 0) are served before normal ones (priority 10). Every time a request is served, waiting ones age by 3 so nothing starves.</p>
+<button id="addn" class="alt">Add normal request</button><button id="adde">Add EMERGENCY request</button><button id="run" class="gray">Serve all</button>
+<div class="msg" id="queue">Queue empty.</div>
+<div class="msg" id="order"></div>
+</div>
+</div>
+
+<div class="tab" id="about">
+<div class="card">
+<h2>How it works</h2>
+<ol>
+<li><b>Authentication:</b> passwords are checked as SHA-256 hashes.</li>
+<li><b>Reference monitor:</b> every request goes through one function that applies role-based rules first.</li>
+<li><b>Break-glass:</b> if denied, a doctor (or a nurse with doctor approval) can declare an emergency with a valid reason code and gets a read-only token for the minimum data set only.</li>
+<li><b>Capability token:</b> signed with HMAC-SHA256, expires after 30 minutes, can be revoked, and is checked on every read.</li>
+<li><b>Audit log:</b> hash-chained, with an alert logged to the supervisor on each emergency.</li>
+<li><b>Review:</b> a supervisor reviews each emergency; unjustified use suspends emergency rights.</li>
+<li><b>Scheduling:</b> priority queue with aging.</li>
+</ol>
+<h2>Try these scenarios</h2>
+<ul>
+<li>Login as <code>d2</code>, request P100 as a routine request: denied. Switch to emergency: granted read-only minimum data. Try reading Billing or writing a note: denied.</li>
+<li>Click “Fast-forward +10 min” three times and read again: token expired.</li>
+<li>Login as <code>n1</code>, request emergency without an approver: denied. Add <code>d2</code> as approver: granted.</li>
+<li>Login as <code>a1</code> and open emergency on P100: only billing, never medical data.</li>
+<li>Login as <code>s1</code>, reject a case on the Review tab, then try the same emergency again as that user: suspended.</li>
+<li>On the Audit Log tab, simulate tampering and verify the chain.</li>
+</ul>
+<p class="hint">Project by Anant Tripathi and Mukul Kumar Singh. Educational simulation; not for real patient data.</p>
+</div>
+</div>
+
+</main>
+<script>
+"use strict";
+const enc=new TextEncoder(),$=id=>document.getElementById(id);
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+const sha=async s=>hex(await crypto.subtle.digest("SHA-256",enc.encode(s)));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const U={d1:{n:"Dr. Rao (treating doctor)",r:"doctor",w:"A"},d2:{n:"Dr. Mehta (ER doctor)",r:"doctor",w:"ER"},n1:{n:"Nurse Priya",r:"nurse",w:"ER"},a1:{n:"Clerk Sameer (admin)",r:"admin",w:"-"},s1:{n:"Officer Kapoor (supervisor)",r:"supervisor",w:"-"}};
+const MIN=["allergies","blood_group","medication","conditions","emergency_contact"],CLIN=MIN.concat(["history","notes"]),ALL=CLIN.concat(["billing"]);
+const REASONS=["UNCONSCIOUS","CARDIAC","TRAUMA","STROKE","RESPIRATORY"],TTL=30*60*1000;
+let P,PW={},KEY,L,REV,SUS,RQ,me,tok,clockOff,chain,SQ,SORD;
+function fresh(){
+ P={p100:{doc:"d1",w:"A",allergies:"Penicillin",blood_group:"B+",medication:"Metformin",conditions:"Type 2 diabetes",emergency_contact:"+91-90000-11111",history:"Appendectomy 2019",notes:"Stable, follow-up in 2 weeks",billing:"Rs. 18,400 due"},
+    p200:{doc:"d2",w:"ER",allergies:"None known",blood_group:"O-",medication:"Atorvastatin",conditions:"Hypertension",emergency_contact:"+91-98888-22222",history:"Knee surgery 2021",notes:"Routine check",billing:"Rs. 5,200 due"}};
+ L=[];REV=new Set();SUS=new Set();RQ=[];me=null;tok=null;clockOff=0;chain=Promise.resolve();SQ=[];SORD="";
+}
+const now=()=>Date.now()+clockOff,stamp=t=>new Date(t||now()).toLocaleTimeString();
+const hm=async s=>hex(await crypto.subtle.sign("HMAC",KEY,enc.encode(s)));
+function log(a,act,p,d){chain=chain.then(async()=>{const prev=L.length?L[L.length-1].hash:"0".repeat(64);const e={i:L.length,t:stamp(),a:a,act:act,p:p||"-",d:d||"",prev:prev};e.hash=await sha(JSON.stringify(e));L.push(e);});return chain;}
+async function mkTok(o){const pl=JSON.stringify(o);return btoa(pl)+"."+await hm(pl);}
+async function openTok(t){try{const[b,s]=t.split(".");const pl=atob(b);return(await hm(pl))===s?JSON.parse(pl):null;}catch(e){return null;}}
+function normalScope(uid,pid){const u=U[uid],p=P[pid];
+ if(u.r==="doctor"&&p.doc===uid)return[CLIN.concat(["billing"]),"read-write"];
+ if(u.r==="nurse"&&p.w===u.w)return[CLIN,"read-only"];
+ if(u.r==="admin")return[["billing"],"read-only"];return null;}
+async function requestAccess(uid,pid,em,reason,appr){
+ const u=U[uid],sc=normalScope(uid,pid),tid=Math.random().toString(16).slice(2,10);
+ if(sc){const t=await mkTok({tid:tid,sub:uid,obj:pid,scope:sc[0],mode:sc[1],kind:"NORMAL",exp:now()+8*3600000});await log(uid,"NORMAL_GRANT",pid,sc[1]);return[t,"GRANTED normal access ("+sc[1]+")"+(em&&u.r==="admin"?". Admin can never get medical data, even in an emergency.":""),1];}
+ if(!em){await log(uid,"DENY",pid,"no rbac permission");return[null,"DENIED: no permission. If life-critical, use emergency access.",0];}
+ if(u.r!=="doctor"&&u.r!=="nurse"){await log(uid,"DENY_EMERGENCY",pid,"role excluded");return[null,"DENIED: this role can never receive medical data.",0];}
+ if(SUS.has(uid)){await log(uid,"DENY_EMERGENCY",pid,"suspended");return[null,"DENIED: your emergency rights are suspended pending review.",0];}
+ if(REASONS.indexOf(reason)<0){await log(uid,"DENY_EMERGENCY",pid,"invalid reason");return[null,"DENIED: invalid reason code.",0];}
+ if(u.r==="nurse"&&!(appr&&U[appr]&&U[appr].r==="doctor")){await log(uid,"DENY_EMERGENCY",pid,"nurse needs doctor approval");return[null,"DENIED: a nurse needs approval from a doctor.",0];}
+ const t=await mkTok({tid:tid,sub:uid,obj:pid,scope:MIN,mode:"read-only",kind:"BREAK-GLASS",reason:reason,exp:now()+TTL});
+ await log(uid,"BREAK_GLASS",pid,"tid="+tid+" reason="+reason+" approver="+(appr||"-"));
+ await log("sys","ALERT_SENT",pid,"supervisor and privacy officer notified");
+ RQ.push({tid:tid,user:uid,pid:pid,reason:reason,done:false});
+ return[t,"GRANTED BREAK-GLASS: read-only, minimum data set, expires in 30 min. Supervisor alerted.",1];}
+async function check(field,needWrite){
+ if(!tok)return[null,"No token. Request access first."];
+ const t=await openTok(tok);
+ if(!t){await log("?","BAD_TOKEN","","signature invalid");return[null,"DENIED: forged or corrupted token."];}
+ if(REV.has(t.tid)){await log(t.sub,"DENY","",t.obj+" revoked");return[null,"DENIED: token revoked."];}
+ if(now()>t.exp){await log(t.sub,"DENY",t.obj,"token expired");return[null,"DENIED: token expired. Request access again."];}
+ if(t.scope.indexOf(field)<0){await log(t.sub,"DENY",t.obj,field+" outside scope");return[null,"DENIED: “"+field+"” is outside this token’s scope."];}
+ if(needWrite&&t.mode!=="read-write"){await log(t.sub,"DENY_WRITE",t.obj,field+" ["+t.kind+"]");return[null,"DENIED: this token is read-only."];}
+ return[t,null];}
+function msg(id,ok,text){$(id).innerHTML="<span class='"+(ok?"ok":"no")+"'>"+(ok?"✔ ":"✖ ")+"</span>"+esc(text);}
+function renderWho(){$("who").innerHTML=me?"Logged in as <b>"+esc(U[me].n)+"</b> <span class='pill'>"+U[me].r+"</span>"+(SUS.has(me)?" <span class='pill bg'>emergency rights suspended</span>":""):"Not logged in.";}
+async function renderTok(){
+ const f=$("fields");
+ if(!tok){$("tokinfo").textContent="No token yet.";f.innerHTML="";return;}
+ const t=await openTok(tok);if(!t)return;
+ const left=Math.max(0,Math.round((t.exp-now())/1000)),st=REV.has(t.tid)?"REVOKED":(left<=0?"EXPIRED":"ACTIVE");
+ $("tokinfo").innerHTML="<span class='pill "+(t.kind==="BREAK-GLASS"?"bg":"")+"'>"+t.kind+"</span> <span class='pill'>"+st+"</span> <span class='pill'>"+t.mode+"</span> patient <b>"+t.obj+"</b>"+(st==="ACTIVE"?" · expires in "+Math.floor(left/60)+"m "+left%60+"s":"")+"<br><span class='hint'>scope: "+t.scope.join(", ")+"</span><br><code>"+esc(tok.slice(0,60))+"…</code>";
+ if(!f.dataset.pid||f.dataset.pid!==t.obj||!f.innerHTML){f.dataset.pid=t.obj;f.innerHTML=ALL.map(x=>"<button class='alt' data-f='"+x+"'>Read "+x.replace("_"," ")+"</button>").join("");}
+}
+function renderLog(){$("logbody").innerHTML=L.map(e=>"<tr id='lr"+e.i+"'><td>"+e.i+"</td><td>"+esc(e.t)+"</td><td>"+esc(e.a)+"</td><td>"+esc(e.act)+"</td><td>"+esc(e.p)+"</td><td>"+esc(e.d)+"</td><td><code>"+e.hash.slice(0,10)+"</code></td></tr>").join("");}
+async function verify(){let prev="0".repeat(64);for(const e of L){const b=Object.assign({},e);delete b.hash;if(e.prev!==prev||(await sha(JSON.stringify(b)))!==e.hash)return e.i;prev=e.hash;}return -1;}
+function renderRev(){
+ const sup=me&&U[me].r==="supervisor";
+ $("revlist").innerHTML=RQ.length?RQ.map((r,i)=>"<div class='msg'>Case <code>"+r.tid+"</code>: <b>"+r.user+"</b> opened emergency on <b>"+r.pid+"</b> (reason "+r.reason+") "+(r.done?"<span class='pill'>reviewed</span>":"<button class='alt' data-rv='"+i+"|1' "+(sup?"":"disabled")+">Justified</button><button data-rv='"+i+"|0' "+(sup?"":"disabled")+">Reject &amp; suspend</button>")+"</div>").join(""):"<div class='msg'>No emergency accesses to review yet.</div>";}
+function renderQ(){$("queue").innerHTML=SQ.length?SQ.map(r=>r.label).join(" · "):"Queue empty.";$("order").innerHTML=SORD?"<b>Service order:</b> "+SORD:"";}
+async function refresh(){renderWho();await renderTok();renderLog();renderRev();renderQ();$("clk").textContent="Simulated time: "+stamp();}
+
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#nav button").forEach(x=>x.classList.remove("on"));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));b.classList.add("on");$(b.dataset.t).classList.add("on");refresh();});
+$("login").onclick=async()=>{const id=$("uid").value;if((await sha($("pw").value))===PW[id]){me=id;tok=null;await log(id,"LOGIN_OK","","");$("who").innerHTML="";}else{await log(id,"LOGIN_FAIL","","");$("who").innerHTML="<span class='no'>✖ Wrong password.</span>";$("pw").value="";return;}$("pw").value="";refresh();};
+$("logout").onclick=async()=>{if(me)await log(me,"LOGOUT","","");me=null;tok=null;$("fields").innerHTML="";$("reqmsg").textContent="";refresh();};
+$("req").onclick=async()=>{if(!me){msg("reqmsg",0,"Login first.");return;}const[t,m,ok]=await requestAccess(me,$("pid").value,$("em").value==="1",$("rs").value,$("ap").value);if(t)tok=t;$("fields").dataset.pid="";msg("reqmsg",ok,m);$("recmsg").textContent="";refresh();};
+$("fields").onclick=async e=>{const f=e.target.dataset.f;if(!f)return;const[t,err]=await check(f,false);if(err){msg("recmsg",0,err);}else{await log(t.sub,"READ",t.obj,f+" ["+t.kind+"]");msg("recmsg",1,f+": "+P[t.obj][f]);}refresh();};
+$("write").onclick=async()=>{const[t,err]=await check("notes",true);if(err){msg("recmsg",0,err);}else{P[t.obj].notes=$("note").value||"(empty)";await log(t.sub,"WRITE",t.obj,"notes");msg("recmsg",1,"Note saved.");}refresh();};
+$("revoke").onclick=async()=>{if(!tok)return;const t=await openTok(tok);if(t){REV.add(t.tid);await log(t.sub,"REVOKE",t.obj,"tid="+t.tid);msg("recmsg",1,"Token revoked.");}refresh();};
+$("fwd").onclick=()=>{clockOff+=10*60000;refresh();};
+$("ver").onclick=async()=>{const bad=await verify();document.querySelectorAll("tr.bad").forEach(r=>r.classList.remove("bad"));if(bad<0)msg("verout",1,"Chain valid: no entry has been altered.");else{msg("verout",0,"Chain BROKEN at entry #"+bad+". Tampering detected.");const r=$("lr"+bad);if(r)r.classList.add("bad");}};
+$("tamper").onclick=()=>{if(L.length<2){msg("verout",0,"Create some log entries first (login and request access).");return;}const i=Math.floor(L.length/2);L[i].d="EDITED BY ATTACKER";renderLog();msg("verout",0,"Entry #"+i+" was modified. Click “Verify chain”.");};
+$("reset").onclick=()=>{fresh();$("reqmsg").textContent="";$("recmsg").textContent="";$("verout").textContent="";refresh();};
+$("revlist").onclick=async e=>{const v=e.target.dataset.rv;if(!v)return;const[i,j]=v.split("|"),r=RQ[+i];r.done=true;await log(me,"REVIEW",r.pid,"tid="+r.tid+" justified="+(j==="1"));if(j==="0"){SUS.add(r.user);await log(me,"SUSPEND",r.pid,r.user+" emergency rights removed");}refresh();};
+let sn=0;
+$("addn").onclick=()=>{SQ.push({label:"normal-"+(++sn),b:10,w:0});renderQ();};
+$("adde").onclick=()=>{SQ.push({label:"EMERGENCY-"+(++sn),b:0,w:0});renderQ();};
+$("run").onclick=()=>{const o=[];while(SQ.length){SQ.sort((a,b)=>(a.b-a.w)-(b.b-b.w));o.push(SQ.shift().label);SQ.forEach(r=>r.w+=3);}SORD=o.join(" → ");renderQ();};
+setInterval(()=>{if(tok)renderTok();$("clk").textContent="Simulated time: "+stamp();},1000);
+
+(async function init(){
+ KEY=await crypto.subtle.importKey("raw",crypto.getRandomValues(new Uint8Array(32)),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+ for(const k in U)PW[k]=await sha(k+"pass");
+ $("uid").innerHTML=Object.keys(U).map(k=>"<option value='"+k+"'>"+k+" · "+U[k].n+"</option>").join("");
+ fresh();refresh();
+})();
+</script>
+</body>
+</html>
